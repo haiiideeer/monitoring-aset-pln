@@ -10,7 +10,10 @@ class Bidang extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama_bidang', 'kode_bidang', 'slug'];
+    protected $fillable = [
+    'nama_bidang',
+    'kode_bidang',
+    'slug'];
 
     public function asets()
     {

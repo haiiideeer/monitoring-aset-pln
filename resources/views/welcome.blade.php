@@ -58,7 +58,7 @@
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-2">
                 <img src="{{ asset('assets/images/foto.png') }}" alt="Logo PLN" class="h-10 w-auto">
-                <span class="text-xl font-bold text-blue-800">PLN Asset Monitoring</span>
+                <span class="text-xl font-bold text-blue-800">Asset Monitoring</span>
             </div>
         </div>
     </nav>

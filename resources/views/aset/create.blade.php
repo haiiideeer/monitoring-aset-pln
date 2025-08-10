@@ -15,7 +15,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Jumlah Aset</label>
-                    <input type="text" name="jumlah_aset" class="form-control" required>
+                    <input type="number" name="jumlah_aset" class="form-control" required min="1">
                 </div>
 
                 <div class="mb-3">
@@ -31,10 +31,11 @@
                     <label class="form-label">Lokasi</label>
                     <input type="text" name="lokasi" class="form-control" required>
                 </div>
-                <!-- <div class="mb-3">
-                    <label class="form-label">Keterangan</label>
-                    <textarea name="keterangan" class="form-control"></textarea>
-                </div> -->
+                <div class="mb-3">
+                    <label class="form-label">Tanggal Perolehan</label>
+                    <input type="date" name="tanggal_perolehan" class="form-control" required>
+                    <small class="text-muted">Format: Hari/Bulan/Tahun</small>
+                </div>
                 <div class="d-flex justify-content-end">
                     <a href="{{ route('aset.index') }}" class="btn btn-secondary me-2">Kembali</a>
                     <button type="submit" class="btn btn-success">Simpan</button>

@@ -5,71 +5,114 @@ namespace App\Http\Controllers;
 use App\Models\Aset;
 use App\Models\Bidang;
 use Illuminate\Http\Request;
-use App\Exports\AsetsExport;
-use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 
 class AsetController extends Controller
 {
-
-    public function show($id)
-{
-    $aset = Aset::findOrFail($id);
-    return view('aset.show', compact('aset'));
-}
-    public function index()
+    public function index(Request $request)
     {
-        $asets = Aset::with('bidang')->get();
-        return view('aset.index', compact('asets'));
-    }
+        try {
+            $query = Aset::with('bidang')->latest();
 
-    public function create()
-    {
-        $bidangs = Bidang::all();
-        return view('aset.create', compact('bidangs'));
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('nama_aset', 'like', "%{$search}%")
+                      ->orWhere('lokasi', 'like', "%{$search}%")
+                      ->orWhereHas('bidang', function ($sub) use ($search) {
+                          $sub->where('nama_bidang', 'like', "%{$search}%");
+                      });
+                });
+            }
+
+            $asets = $query->paginate(10);
+            return view('aset.index', compact('asets'));
+            
+        } catch (\Exception $e) {
+            Log::error('Error in AsetController@index: ' . $e->getMessage());
+            return redirect()->route('aset.index')->with('error', 'Terjadi kesalahan saat memuat data aset.');
+        }
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'bidang_id' => 'required|exists:bidangs,id',
-            'nama_aset' => 'required',
-            'jumlah_aset' => 'required',
-            'lokasi' => 'required',
-        ]);
+        try {
+            $validated = $request->validate([
+                'bidang_id' => 'required|exists:bidangs,id',
+                'nama_aset' => 'required|string|max:255|unique:asets,nama_aset',
+                'jumlah_aset' => 'required|integer|min:1',
+                'lokasi' => 'required|string|max:255',
+                'tanggal_perolehan' => 'required|date|before_or_equal:today',
+            ]);
 
-        Aset::create($request->all());
+            $validated['tanggal_perolehan'] = Carbon::parse($validated['tanggal_perolehan'])->format('Y-m-d');
+            
+            Aset::create($validated);
 
-        return redirect()->route('aset.index')->with('success', 'Aset berhasil ditambahkan.');
-    }
-
-    public function edit(Aset $aset)
-    {
-        $bidangs = Bidang::all();
-        return view('aset.edit', compact('aset', 'bidangs'));
+            return redirect()->route('aset.index')
+                ->with('success', 'Data aset berhasil ditambahkan.');
+                
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput();
+                
+        } catch (\Exception $e) {
+            Log::error('Error in AsetController@store: ' . $e->getMessage());
+            return redirect()->route('aset.index')
+                ->with('error', 'Gagal menambahkan data aset. Silakan coba lagi.');
+        }
     }
 
     public function update(Request $request, Aset $aset)
     {
-        $request->validate([
-            'bidang_id' => 'required|exists:bidangs,id',
-            'nama_aset' => 'required',
-            'jumlah_aset' => 'required',
-            'lokasi' => 'required',
-        ]);
+        try {
+            $validated = $request->validate([
+                'bidang_id' => 'required|exists:bidangs,id',
+                'nama_aset' => 'required|string|max:255|unique:asets,nama_aset,'.$aset->id,
+                'jumlah_aset' => 'required|integer|min:1',
+                'lokasi' => 'required|string|max:255',
+                'tanggal_perolehan' => 'required|date|before_or_equal:today',
+            ]);
 
-        $aset->update($request->all());
+            $validated['tanggal_perolehan'] = Carbon::parse($validated['tanggal_perolehan'])->format('Y-m-d');
+            
+            $aset->update($validated);
 
-        return redirect()->route('aset.index')->with('success', 'Aset berhasil diperbarui.');
+            return redirect()->route('aset.index')
+                ->with('success', 'Aset berhasil diperbarui.');
+                
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput();
+                
+        } catch (\Exception $e) {
+            Log::error('Error in AsetController@update: ' . $e->getMessage());
+            return redirect()->route('aset.index')
+                ->with('error', 'Gagal memperbarui data aset. Silakan coba lagi.');
+        }
     }
 
     public function destroy(Aset $aset)
     {
-        $aset->delete();
-        return redirect()->route('aset.index')->with('success', 'Aset berhasil dihapus.');
+        try {
+            // Tambahkan pengecekan authorization jika diperlukan
+            // if (!Gate::allows('delete-aset', $aset)) {
+            //     abort(403, 'Unauthorized action.');
+            // }
+
+            $aset->delete();
+
+            return redirect()->route('aset.index')
+                ->with('success', 'Aset berhasil dihapus.');
+                
+        } catch (\Exception $e) {
+            Log::error('Error in AsetController@destroy: ' . $e->getMessage());
+            return redirect()->route('aset.index')
+                ->with('error', 'Gagal menghapus data aset. Silakan coba lagi.');
+        }
     }
-    
- public function exportExcel($bidang_id)
-{
-    return Excel::download(new AsetsExport($bidang_id), 'data_aset_bidang_'.$bidang_id.'.xlsx');
-}
 }

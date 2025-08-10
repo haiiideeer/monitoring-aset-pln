@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Laporan\LaporanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BidangController;
 use App\Http\Controllers\AsetController;
@@ -33,9 +34,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/bidang', BidangController::class);
 });
 
-// ===== QR Code & Export per Bidang =====
-// QR Code Bidang yang mengarahkan ke daftar aset
-Route::get('bidang/{slug}/qrcode', [BidangBarcodeController::class, 'generateQR'])->name('bidang.qrcode');
+
 
 // Menampilkan daftar aset milik bidang (hasil dari QR Code)
 Route::get('bidang/{slug}/asets', [BidangBarcodeController::class, 'showAsets'])->name('bidang.show');
@@ -44,9 +43,7 @@ Route::get('bidang/{slug}/asets', [BidangBarcodeController::class, 'showAsets'])
 Route::get('bidang/{slug}/export/excel', [BidangBarcodeController::class, 'exportExcel'])->name('bidang.export.excel');
 Route::get('bidang/{slug}/export/pdf', [BidangBarcodeController::class, 'exportPDF'])->name('bidang.export.pdf');
 
-// (Opsional) QR Code View khusus bidang
-Route::get('bidang/barcode/{slug}', [BidangBarcodeController::class, 'show'])->name('bidang.barcode.show');
-Route::get('bidang/barcode/{slug}/qrcode', [BidangBarcodeController::class, 'generateQR'])->name('bidang.barcode.qrcode');
+
 
 // Export semua aset (tanpa filter bidang)
 Route::get('/asets/export/excel', [AsetController::class, 'exportAllExcel'])->name('asets.export.all');
@@ -54,7 +51,16 @@ Route::get('/asets/export/excel', [AsetController::class, 'exportAllExcel'])->na
 // Auth routes
 require __DIR__.'/auth.php';
 
+
 // Route fallback
 Route::fallback(function () {
     return 'Halaman tidak ditemukan. Route fallback aktif.';
 });
+Route::delete('bidang/{bidang}', [BidangController::class, 'destroy'])->name('bidang.destroy');
+Route::delete('aset/{aset}', [asetController::class, 'destroy'])->name('aset.destroy');
+
+// Laporan
+            Route::prefix('laporan')->middleware('auth')->group(function () {
+            Route::get('/', [LaporanController::class, 'index'])->name('laporan.index');
+            Route::post('/export-pdf', [LaporanController::class, 'exportPdf'])->name('laporan.exportPdf');
+        });

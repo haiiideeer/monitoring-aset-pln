@@ -1,4 +1,4 @@
-{{-- resources/views/dashboard.blade.php --}}
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -54,7 +54,8 @@
     <aside class="w-64 bg-white shadow-lg flex flex-col justify-between py-6">
         <div>
             <div class="px-6 mb-8 text-center">
-                <img src="{{ asset('assets/images/foto.png') }}" alt="Logo PLN" class="h-12 mx-auto mb-2">
+               <!-- Ukuran berbeda di layar berbeda -->
+<img src="{{ asset('assets/images/foto.png') }}" alt="Logo PLN" class="h-12 w-auto mx-auto mb-2">
                 <span class="text-xl font-bold text-blue-800 block">Asset Monitoring</span>
             </div>
             <nav>
@@ -83,13 +84,8 @@
         </a>
     </li>
     <li class="mt-2">
-        <a href="{{ url('/aset/export/excel') }}" class="sidebar-link flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 hover:text-blue-600 rounded-r-full">
-            <i class="fas fa-file-excel mr-3 text-lg"></i> Export Excel
-        </a>
-    </li>
-    <li class="mt-2">
-        <a href="{{ url('/aset/export/pdf') }}" class="sidebar-link flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 hover:text-blue-600 rounded-r-full">
-            <i class="fas fa-file-pdf mr-3 text-lg"></i> Export PDF
+        <a href="{{ url('/laporan') }}" class="sidebar-link flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 hover:text-blue-600 rounded-r-full">
+            <i class="fas fa-file-excel mr-3 text-lg"></i> Laporan
         </a>
     </li>
 </ul>
@@ -101,7 +97,7 @@
     {{-- Main Content --}}
     <div class="flex-1 flex flex-col overflow-hidden">
         <header class="bg-white shadow-md py-4 px-6 flex justify-between items-center relative">
-            <h1 class="text-2xl font-bold text-gray-800">Dashboard Utama</h1>
+            <h1 class="text-2xl font-bold text-gray-800">Dashboard Admin</h1>
             <div class="relative">
                 <div id="profileDropdownBtn" class="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100">
                     <span class="text-gray-700">Selamat datang, {{ Auth::user()->name ?? 'Admin' }}</span>
