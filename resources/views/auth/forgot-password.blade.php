@@ -1,7 +1,7 @@
 <x-guest-layout>
     <!-- Logo PLN (opsional, bisa dihapus jika tidak diinginkan) -->
     <div class="text-center mb-1">
-        <img src="{{ asset('assets/images/foto.png') }}" alt="Logo PLN" class="mx-auto w-2">
+        <img src="{{ asset('asset/images/foto.png') }}" alt="Logo PLN" class="mx-auto w-2">
     </div>
 
     <div class="mb-4 text-sm text-gray-600 text-center">

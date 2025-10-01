@@ -13,15 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('asets', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('bidang_id')->constrained()->onDelete('cascade');
-        $table->string('nama_aset');
-        $table->string('kode_aset')->unique();
-        $table->string('lokasi');
-        $table->text('keterangan')->nullable();
-        $table->timestamps();
-
+        Schema::table('assets', function (Blueprint $table) {
+        DB::statement("ALTER TABLE assets MODIFY kondisi ENUM('Baik','Rusak','Perlu Perbaikan','Dalam Perbaikan')");
         });
     }
 
@@ -32,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('asets');
+        Schema::table('assets', function (Blueprint $table) {
+        DB::statement("ALTER TABLE assets MODIFY kondisi ENUM('Baik','Tidak Baik')");
+        });
     }
 };
